@@ -1,0 +1,6 @@
+{
+  "name": "currence/emandates",
+  "description": "Supporting libraries for eMandates protocol",
+  "type": "library",
+  "version": "1.16.4"
+}
