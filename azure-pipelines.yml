@@ -32,9 +32,9 @@ steps:
     #Contents: "**"
     SourceFolder: "$(Build.SourcesDirectory)"
     Contents: |
-      Library\\**
+      Library//**
       CHANGELOG.txt
-      LICENCE
+      LICENse
       README.md
     TargetFolder: '$(Build.SourcesDirectory)\\TEMP'
 
