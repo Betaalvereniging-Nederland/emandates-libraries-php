@@ -329,11 +329,17 @@ class AcceptanceReport {
 	}
 
 	private function _processOptionalFields($xpath, $origMndt) {
-		$result = $xpath->evaluate($origMndt . '/p:MaxAmt/p:Value');
-		if ($result->length != 0)
-			$this->MaxAmount = (string) $result->item(0)->nodeValue;
-		else
-			unset($this->MaxAmount);
+        $result = $xpath->evaluate($origMndt . '/p:MaxAmt/p:Value');
+        if ($result->length != 0) {
+            $this->MaxAmount = (string) $result->item(0)->nodeValue;
+        } else {
+            $result = $xpath->evaluate($origMndt . '/p:MaxAmt');
+            if ($result->length != 0) {
+                $this->MaxAmount = (string) $result->item(0)->nodeValue;
+            } else {
+                unset($this->MaxAmount);
+            }
+        }
 
 		$result = $xpath->evaluate($origMndt . '/p:Rsn/p:Prtry');
 		if ($result->length != 0)
