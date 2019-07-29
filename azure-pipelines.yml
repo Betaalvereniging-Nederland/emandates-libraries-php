@@ -27,13 +27,13 @@ steps:
 
 #create archive
 - task: CopyFiles@2
-  displayName: 'Copy Sample library'
+  displayName: 'Copy library: from $(Build.SourcesDirectory)'
   inputs:
     #Contents: "**"
     SourceFolder: "$(Build.SourcesDirectory)"
     Contents: |
-      \\**
-      ChangeLog.txt
+      Library\\**
+      CHANGELOG.txt
       LICENCE
       README.md
     TargetFolder: '$(Build.SourcesDirectory)\\TEMP'
