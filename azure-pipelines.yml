@@ -10,7 +10,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  phpVersion: 7.2
+  phpVersion: 5.5
 
 steps:
 - script: |
@@ -34,7 +34,7 @@ steps:
     Contents: |
       Library//**
       CHANGELOG.txt
-      LICENse
+      LICENSE
       README.md
     TargetFolder: '$(Build.SourcesDirectory)/TEMP'
 
