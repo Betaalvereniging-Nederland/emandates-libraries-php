@@ -36,11 +36,11 @@ steps:
       CHANGELOG.txt
       LICENse
       README.md
-    TargetFolder: '$(Build.SourcesDirectory)\\TEMP'
+    TargetFolder: '$(Build.SourcesDirectory)/TEMP'
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.SourcesDirectory)\\TEMP\\'
+    rootFolderOrFile: '$(Build.SourcesDirectory)/TEMP'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/eMandates.PHP.Creditor.Libraries.$(VAR_VERSION).zip'
