@@ -309,7 +309,7 @@ class CoreCommunicator {
 			} else {
 				curl_close($ch);
 
-				$doc = @simplexml_load_string($data);
+                $doc = @simplexml_load_string($data, 'SimpleXMLElement', LIBXML_NOENT);
 				if (!$doc) {
 					$this->logger->Log("Raw Response : " . $data);
 					throw new CommunicatorException($data);
@@ -327,7 +327,7 @@ class CoreCommunicator {
 	 * Returns the current version of the library.
 	 */
 	public static function getVersion() {
-		return "1.16.3";
+		return "1.16.5";
 	}
 
 }

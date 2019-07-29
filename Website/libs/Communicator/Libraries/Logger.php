@@ -40,8 +40,10 @@ class Logger {
 
         if ($this->enableXMLLogs) {
 			if ($isXML) {
-				$domtree = new DOMDocument();
-				$domtree->loadXML($dom);
+                $oldValue = libxml_disable_entity_loader(true);
+                $domtree = new DOMDocument();
+                $domtree->loadXML($dom);
+                libxml_disable_entity_loader($oldValue);
 
 				$dom = $domtree;
 			}
