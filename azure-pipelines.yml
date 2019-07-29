@@ -24,3 +24,31 @@ steps:
 
 - script: composer install --no-interaction --prefer-dist
   displayName: 'composer install'
+
+#create archive
+- task: CopyFiles@2
+  displayName: 'Copy Sample library'
+  inputs:
+    #Contents: "**"
+    SourceFolder: "$(Build.SourcesDirectory)"
+    Contents: |
+      \\**
+      ChangeLog.txt
+      LICENCE
+      README.md
+    TargetFolder: '$(Build.SourcesDirectory)\\TEMP'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.SourcesDirectory)\\TEMP\\'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/eMandates.PHP.Creditor.Libraries.$(VAR_VERSION).zip'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: $(Build.ArtifactStagingDirectory)
+    artifactName: Library
+
+#end create archive
