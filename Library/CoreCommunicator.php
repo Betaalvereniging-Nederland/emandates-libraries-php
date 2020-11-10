@@ -59,7 +59,7 @@ class CoreCommunicator {
 	protected $logger;
 
 	/**
-	 * The singer object used to sign requests and verify response
+	 * The signer object used to sign requests and verify response
 	 * 
 	 * @var XmlSecurity
 	 */
