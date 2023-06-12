@@ -1,3 +1,6 @@
+v1.16.6 (June 2023)
+* COT-775: [PHP] Investigate XXE vulnerability in PHP library
+
 v1.16.5second (June 2019)
 * add missing cacert.pem file
 * COT-287: [PHP] eMandates library cannot parse maxAmount field
