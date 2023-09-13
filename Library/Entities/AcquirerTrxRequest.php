@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
 /**
  * AquirerTrxReq description
  */
@@ -56,7 +58,7 @@ class AcquirerTrxRequest {
 	 * @return \DOMDocument
 	 */
 	public function toXml($LocalInstrumentCode) {
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the root element of the xml tree */
 		$AcquirerTrxReq = $domtree->createElementNS(self::XMLNS, 'AcquirerTrxReq');
@@ -73,7 +75,7 @@ class AcquirerTrxRequest {
 
 		/* create the Issuer */
 		$issuer = $domtree->createElement('Issuer'); {
-			$issuer->appendChild(new DOMElement('issuerID', $this->issuerID));
+			$issuer->appendChild(new \DOMElement('issuerID', $this->issuerID));
 		}
 		$AcquirerTrxReq->appendChild($issuer);
 
@@ -133,7 +135,7 @@ class AcquirerTrxReqTransaction {
 	 * Constructor that highlights the required fields
 	 * 
 	 * @param string $entranceCode
-	 * @param DateInterval $expirationPeriod
+	 * @param \DateInterval $expirationPeriod
 	 * @param string $language
 	 * @param NewMandateRequest | AmendmentRequest | CancellationRequest $container
 	 */
@@ -148,10 +150,10 @@ class AcquirerTrxReqTransaction {
 	 * Serializes the object into a Transaction
 	 * 
 	 * @param string $LocalInstrumentCode
-	 * @return DOMElement
+	 * @return \DOMElement
 	 */
 	public function toXml($LocalInstrumentCode) {
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the Transaction elem */
 		$Transaction = $domtree->createElement('Transaction');
@@ -178,7 +180,7 @@ class AcquirerTrxReqTransaction {
 	/**
 	 * Returns the str representation of a DateInterval
 	 * 
-	 * @param DateInterval $dateInterval
+	 * @param \DateInterval $dateInterval
 	 * @return string
 	 */
 	private function DateIntervalToStr($dateInterval) {

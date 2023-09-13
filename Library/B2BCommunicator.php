@@ -1,6 +1,19 @@
 <?php
 
-require_once 'CoreCommunicator.php';
+namespace EMandates\Merchant\Library;
+
+use EMandates\Merchant\Library\Configuration\Configuration;
+
+/* CANCEL & ACQUIRER TRANSACTION */
+use EMandates\Merchant\Library\Entities\{CancellationRequest,
+	CancellationResponse,
+	AcquirerTrxRequest,
+	AcquirerTrxReqMerchant,
+	AcquirerTrxReqTransaction
+};
+
+/* Validator */
+use EMandates\Merchant\Library\Libraries\XmlValidator;
 
 /**
  * Description of Communicator
@@ -23,7 +36,7 @@ class B2BCommunicator extends CoreCommunicator {
 	 * Performs a CancellationRequest and returns the appropiate CancellationResponse
 	 * 
 	 * @param CancellationRequest $cancellationRequest
-	 * @return \CancellationResponse
+	 * @return CancellationResponse
 	 */
 	public function Cancel(CancellationRequest $cancellationRequest) {
 		$cancellationRequest->logger = $this->logger;
@@ -49,12 +62,12 @@ class B2BCommunicator extends CoreCommunicator {
 			XmlValidator::isValidatXML($response, XmlValidator::SCHEMA_IDX, $this->logger);
 			try {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirer);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirerAlternative);
 			}
 
 			return new CancellationResponse($response);
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			return new CancellationResponse($ex->getMessage(), (!empty($response) ? $response : ''));
 		}
 	}

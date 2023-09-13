@@ -1,5 +1,11 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
+use EMandates\Merchant\Library\B2BCommunicator;
+
+use EMandates\Merchant\Library\Libraries\{MessageIdGenerator, XmlValidator, CommunicatorException};
+
 /**
  * Description of eMandate
  */
@@ -64,14 +70,14 @@ class NewMandateRequest {
 
 	/**
 	 * Indicates type of eMandate: one-off or sequenceType direct debit.
-	 * @var type 
+	 * @var string 
 	 */
 	public $SequenceType;
 
 	/**
 	 * Optional: The period of validity of the transaction request as stated by the creditor measured from the receipt by the debtor bank.
 	 * The debtor must authorise the transaction within this period.
-	 * @var DateInterval 
+	 * @var \DateInterval 
 	 */
 	public $ExpirationPeriod;
 
@@ -101,7 +107,7 @@ class NewMandateRequest {
 	 * @param string $purchaseId
 	 * @param string $sequenceType
 	 * @param string $maxAmount - optional
-	 * @param DateInterval $expirationPeriod - optional
+	 * @param \DateInterval $expirationPeriod - optional
 	 */
 	public function __construct($entranceCode, $language, $messageId, $eMandateId, $eMandateReason, $debtorReference, $debtorBankId, $purchaseId, $sequenceType, $maxAmount = '', $expirationPeriod = null) {
 
@@ -129,13 +135,13 @@ class NewMandateRequest {
 	 * Serializes the object into a Document
 	 * 
 	 * @param string $LocalInstrumentCode
-	 * @return DOMElement
+	 * @return \DOMElement
 	 */
 	public function toXml($LocalInstrumentCode) {
 		$this->logger->Log("building eMandate");
 		$this->validateExpirationPeriodAndMaxAmount();
 
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the Document element with it's namespaces */
 		$Document = $domtree->createElement('Document');
@@ -147,36 +153,36 @@ class NewMandateRequest {
 				/* create the GrpHdr element */
 				$GrpHdr = $domtree->createElement('GrpHdr'); {
 					/* create the MsgId and the CreDtTm elements */
-					$GrpHdr->appendChild(new DOMElement('MsgId', $this->MessageId));
-					$GrpHdr->appendChild(new DOMElement('CreDtTm', date('Y-m-d\TH:i:s'.substr((string)microtime(), 1, 4).'\Z')));
+					$GrpHdr->appendChild(new \DOMElement('MsgId', $this->MessageId));
+					$GrpHdr->appendChild(new \DOMElement('CreDtTm', date('Y-m-d\TH:i:s'.substr((string)microtime(), 1, 4).'\Z')));
 				}
 				$MndtInitnReq->appendChild($GrpHdr);
 
 				/* create the Mndt element */
 				$Mndt = $domtree->createElement('Mndt'); {
 					/* create MndtId elemnt */
-					$Mndt->appendChild(new DOMElement('MndtId', $this->eMandateId));
+					$Mndt->appendChild(new \DOMElement('MndtId', $this->eMandateId));
 
 					/* create MndtReqId element */
-					$Mndt->appendChild(new DOMElement('MndtReqId', self::NOT_PROVIDED));
+					$Mndt->appendChild(new \DOMElement('MndtReqId', self::NOT_PROVIDED));
 
 					/* create Tp element */
 					$Tp = $domtree->createElement('Tp'); {
 						/* create SvcLvl element */
 						$SvcLvl = $domtree->createElement('SvcLvl');
-						$SvcLvl->appendChild(new DOMElement('Cd', self::SEPA));
+						$SvcLvl->appendChild(new \DOMElement('Cd', self::SEPA));
 						$Tp->appendChild($SvcLvl);
 
 						/* create LclInstrm element */
 						$LclInstrm = $domtree->createElement('LclInstrm');
-						$LclInstrm->appendChild(new DOMElement('Cd', $LocalInstrumentCode));
+						$LclInstrm->appendChild(new \DOMElement('Cd', $LocalInstrumentCode));
 						$Tp->appendChild($LclInstrm);
 					}
 					$Mndt->appendChild($Tp);
 
 					/* create Ocrncs element */
 					$Ocrncs = $domtree->createElement('Ocrncs');
-					$Ocrncs->appendChild(new DOMElement('SeqTp', $this->SequenceType));
+					$Ocrncs->appendChild(new \DOMElement('SeqTp', $this->SequenceType));
 					$Mndt->appendChild($Ocrncs);
 
 					/* create MaxAmt element */
@@ -189,12 +195,12 @@ class NewMandateRequest {
 					/* create Rsn element */
 					if (!empty($this->eMandateReason)) {
 						$Rsn = $domtree->createElement('Rsn');
-						$Rsn->appendChild(new DOMElement('Prtry', $this->eMandateReason));
+						$Rsn->appendChild(new \DOMElement('Prtry', $this->eMandateReason));
 						$Mndt->appendChild($Rsn);
 					}
 
 					/* create Cdtr element */
-					$Mndt->appendChild(new DOMElement('Cdtr'));
+					$Mndt->appendChild(new \DOMElement('Cdtr'));
 
 					/* create Dbtr element */
 					$Dbtr = $domtree->createElement('Dbtr'); {
@@ -202,7 +208,7 @@ class NewMandateRequest {
 							$Id = $domtree->createElement('Id'); {
 							$PrvtId = $domtree->createElement('PrvtId'); {
 								$Othr = $domtree->createElement('Othr');
-								$Othr->appendChild(new DOMElement('Id', $this->DebtorReference));
+								$Othr->appendChild(new \DOMElement('Id', $this->DebtorReference));
 								$PrvtId->appendChild($Othr);
 								}
 							}
@@ -215,7 +221,7 @@ class NewMandateRequest {
 					/* create DbtrAgt element */
 					$DbtrAgt = $domtree->createElement('DbtrAgt'); {
 						$FinInstnId = $domtree->createElement('FinInstnId');
-						$FinInstnId->appendChild(new DOMElement('BICFI', $this->DebtorBankId));
+						$FinInstnId->appendChild(new \DOMElement('BICFI', $this->DebtorBankId));
 						$DbtrAgt->appendChild($FinInstnId);
 					}
 					$Mndt->appendChild($DbtrAgt);
@@ -225,7 +231,7 @@ class NewMandateRequest {
 						$RfrdDoc = $domtree->createElement('RfrdDoc'); {
 							$Tp = $domtree->createElement('Tp'); {
 								$CdOrPrtry = $domtree->createElement('CdOrPrtry');
-								$CdOrPrtry->appendChild(new DOMElement('Prtry', $this->PurchaseId));
+								$CdOrPrtry->appendChild(new \DOMElement('Prtry', $this->PurchaseId));
 								$Tp->appendChild($CdOrPrtry);
 							}
 							$RfrdDoc->appendChild($Tp);
@@ -254,10 +260,10 @@ class NewMandateRequest {
 		
 		//EXPIRATION PERIOD
 		if(!empty($this->ExpirationPeriod)){
-			$max_future = new DateTime();
-			$max_future->add(new DateInterval('P7DT1S')); // max plus one second
+			$max_future = new \DateTime();
+			$max_future->add(new \DateInterval('P7DT1S')); // max plus one second
 
-			$future = new DateTime();
+			$future = new \DateTime();
 			$future->add($this->ExpirationPeriod);
 
 			$check_interval2 = $max_future->diff($future);

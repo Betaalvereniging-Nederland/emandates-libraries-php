@@ -12,7 +12,7 @@ class DBLogger {
 	/**
 	 * Saves the desired dom or xml into the logPath folder
 	 * 
-	 * @param DOMDocument/string $dom
+	 * @param \DOMDocument/string $dom
 	 */
 	public function LogXmlMessage($dom, $isXML = false) {
 		// log request/response messages

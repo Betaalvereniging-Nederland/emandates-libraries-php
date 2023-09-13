@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
 /**
  * Describes an error response
  */
@@ -38,9 +40,9 @@ class ErrorResponse {
 	/**
 	 * Builds an ErrorResponse from the errRes received
 	 * 
-	 * @param SimpleXMLElement $errRes
+	 * @param \SimpleXMLElement $errRes
 	 */
-	public function __construct(SimpleXMLElement $errRes) {
+	public function __construct(\SimpleXMLElement $errRes) {
 
 		$this->ErrorCode = (string) $errRes->Error->errorCode;
 		$this->ErrorMessage = (string) $errRes->Error->errorMessage;

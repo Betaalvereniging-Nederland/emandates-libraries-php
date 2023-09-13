@@ -1,6 +1,9 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../../config/eMandatesConfig.php';
+namespace EMandates\Merchant\Library\Configuration;
+
+if(file_exists(dirname(__FILE__) . '/../../../config/eMandatesConfig.php'))
+	require_once dirname(__FILE__) . '/../../../config/eMandatesConfig.php';
 
 /**
  * Description of Configuration
@@ -191,5 +194,35 @@ class Configuration {
 				$emandates_config_params['fileName']
 		);
 	}
+
+	/**
+     * Attempts to load the settings from the application's configuration
+     */
+    public static function load($configXml) {
+        $configuration = new \SimpleXMLElement(file_get_contents($configXml), FILE_USE_INCLUDE_PATH);
+        foreach ($configuration->appSettings->add as $item) {
+            $key = (string) $item['key'];
+            $value = (string) $item['value'];
+            switch ($key) {
+                case 'passphrase': self::defaultInstance()->passphrase = $value; break;
+				case 'keyFile': self::defaultInstance()->keyFile = $value; break;
+				case 'crtFile': self::defaultInstance()->crtFile = $value; break;
+				case 'crtFileAquirer': self::defaultInstance()->crtFileAquirer = $value; break;
+				case 'crtFileAquirerAlternative': self::defaultInstance()->crtFileAquirerAlternative = $value; break;
+				case 'contractID': self::defaultInstance()->contractID = $value; break;
+				case 'contractSubID': self::defaultInstance()->contractSubID = $value; break;
+				case 'merchantReturnURL': self::defaultInstance()->merchantReturnURL = $value; break;
+				case 'AcquirerUrl_DirectoryReq': self::defaultInstance()->AcquirerUrl_DirectoryReq = $value; break;
+				case 'AcquirerUrl_TransactionReq': self::defaultInstance()->AcquirerUrl_TransactionReq = $value; break;
+				case 'AcquirerUrl_StatusReq': self::defaultInstance()->AcquirerUrl_StatusReq = $value; break;
+				case 'enableXMLLogs': self::defaultInstance()->enableXMLLogs = $value; break;
+				case 'logPath': self::defaultInstance()->logPath = $value; break;
+				case 'folderNamePattern': self::defaultInstance()->folderNamePattern = $value; break;
+				case 'fileNamePrefix': self::defaultInstance()->fileNamePrefix = $value; break;
+				case 'enableInternalLogs': self::defaultInstance()->enableInternalLogs = $value; break;
+				case 'fileName': self::defaultInstance()->fileName = $value; break;
+            }
+        }
+    }
 
 }

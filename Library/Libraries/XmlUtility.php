@@ -1,5 +1,10 @@
 <?php
 
+namespace EMandates\Merchant\Library\Libraries;
+
+use EMandates\Merchant\Library\Configuration\Configuration;
+use EMandates\Merchant\Library\Libraries\Logger;
+
 /**
  * Utility class for processing XML documents
  */
@@ -11,7 +16,7 @@ class XmlUtility
      */
     public static function parse($xml)
     {
-        $log = new \Logger(Configuration::getDefault());
+        $log = new Logger(Configuration::getDefault());
         // $log->LogXmlMessage($xml, true, 'OriginalDoc');
 
         // Get default namespace before cleaning the doc

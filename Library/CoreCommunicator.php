@@ -1,39 +1,24 @@
 <?php
 
-require_once "Configuration/Configuration.php";
-require_once "B2BCommunicator.php";
-require_once "Libraries/XmlUtility.php";
+namespace EMandates\Merchant\Library;
 
-/* DIRECTORY */
-require_once "Entities/DirectoryRequest.php";
-require_once "Entities/DirectoryResponse.php";
-
-/* TRANSACTION */
-require_once "Entities/AcquirerTrxRequest.php";
-
-/* NEW eMANDATE */
-require_once "Entities/NewMandateRequest.php";
-require_once "Entities/NewMandateResponse.php";
-
-/* STATUS */
-require_once "Entities/AcquirerStatusRequest.php";
-require_once "Entities/AcquirerStatusResponse.php";
-
-/* CANCEL */
-require_once "Entities/CancellationRequest.php";
-require_once "Entities/CancellationResponse.php";
-
-/* AMEND */
-require_once "Entities/AmendmentRequest.php";
-require_once "Entities/AmendmentResponse.php";
-
-/* Signer and Validator */
-require_once "Libraries/XmlSecurity.php";
-require_once "Libraries/XmlValidator.php";
-
-require_once 'Libraries/CommunicatorException.php';
-require_once 'Libraries/MessageIdGenerator.php';
-require_once 'Libraries/Logger.php';
+use EMandates\Merchant\Library\Configuration\Configuration;
+use EMandates\Merchant\Library\Libraries\{Logger, XmlSecurity, XmlValidator};
+use EMandates\Merchant\Library\Entities\{DirectoryRequest,
+	DirectoryResponse,
+	NewMandateRequest,
+	NewMandateResponse,
+	AcquirerTrxRequest,
+	AcquirerTrxReqTransaction,
+	AcquirerTrxReqMerchant, 
+	Merchant,
+	StatusRequest,
+	AcquirerStatusRequest,
+	AcquirerStatusReqMerchant,
+	AcquirerStatusResponse,
+	AmendmentRequest,
+	AmendmentResponse
+};
 
 /**
  * Description of Communicator
@@ -59,7 +44,7 @@ class CoreCommunicator {
 	protected $logger;
 
 	/**
-	 * The singer object used to sign requests and verify response
+	 * The signer object used to sign requests and verify response
 	 * 
 	 * @var XmlSecurity
 	 */
@@ -88,7 +73,7 @@ class CoreCommunicator {
 	/**
 	 * Performs a DirectoryRequest and returns the apropiate DirectoryResponse
 	 * 
-	 * @return \DirectoryResponse
+	 * @return DirectoryResponse
 	 */
 	public function Directory() {
 		$this->logger->Log("sending new directory request");
@@ -112,12 +97,12 @@ class CoreCommunicator {
 			XmlValidator::isValidatXML($response, XmlValidator::SCHEMA_IDX, $this->logger);
 			try {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirer);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirerAlternative);
 			}
 
 			return new DirectoryResponse($response);
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			return new DirectoryResponse($ex->getMessage(), (!empty($response) ? $response : ''));
 		}
 	}
@@ -154,12 +139,12 @@ class CoreCommunicator {
 			XmlValidator::isValidatXML($response, XmlValidator::SCHEMA_IDX, $this->logger);
 			try {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirer);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirerAlternative);
 			}
 
 			return new NewMandateResponse($response);
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			return new NewMandateResponse($ex->getMessage(), (!empty($response) ? $response : ''));
 		}
 	}
@@ -177,7 +162,7 @@ class CoreCommunicator {
 		$AcquirerStatusReq = new AcquirerStatusRequest(
 				$c::PRODUCT_ID, $c::VERSION, new AcquirerStatusReqMerchant(
 				$this->Configuration->contractID, $this->Configuration->contractSubID
-				), new AcquirerStatusReqTransaction(
+				), new Entities\AcquirerStatusReqTransaction(
 				$statusRequest->TransactionId
 				)
 		);
@@ -192,12 +177,12 @@ class CoreCommunicator {
 			XmlValidator::isValidatXML($response, XmlValidator::SCHEMA_IDX, $this->logger);
 			try {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirer);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirerAlternative);
 			}
 
 			return new AcquirerStatusResponse($response, $this->logger);
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			return new AcquirerStatusResponse($ex->getMessage(), $this->logger, (!empty($response) ? $response : ''));
 		}
 	}
@@ -233,12 +218,12 @@ class CoreCommunicator {
 			XmlValidator::isValidatXML($response, XmlValidator::SCHEMA_IDX, $this->logger);
 			try {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirer);
-			} catch (Exception $e) {
+			} catch (\Exception $e) {
 				$this->signer->verify($response, $this->Configuration->crtFileAquirerAlternative);
 			}
 
 			return new AmendmentResponse($response);
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			return new AmendmentResponse($ex->getMessage(), (!empty($response) ? $response : ''));
 		}
 	}
@@ -251,12 +236,12 @@ class CoreCommunicator {
 
 	/**
 	 * Sends the xml to the provided url and returns the response
-	 * Throws an Exception if there was something wrong with the curl
+	 * Throws an \Exception if there was something wrong with the curl
 	 * 
 	 * @param string $xml
 	 * @param string $url
 	 * @return string
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	protected function PerformRequest($docTree, $url) {
 
@@ -305,14 +290,14 @@ class CoreCommunicator {
 				curl_close($ch);
 
 				$this->logger->Log($error);
-				throw new Exception($error);
+				throw new \Exception($error);
 			} else {
 				curl_close($ch);
 
                 $doc = @simplexml_load_string($data);
 				if (!$doc) {
 					$this->logger->Log("Raw Response : " . $data);
-					throw new CommunicatorException($data);
+					throw new Libraries\CommunicatorException($data);
 				}
 
 				// Log the xml received
