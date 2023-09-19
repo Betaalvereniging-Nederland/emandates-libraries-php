@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
 /**
  * Describes a status request
  *
@@ -48,7 +50,7 @@ class AcquirerStatusRequest {
 	 * @return \DOMDocument
 	 */
 	public function toXml() {
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the root element of the xml tree */
 		$AcquirerStatusReq = $domtree->createElementNS(self::XMLNS, 'AcquirerStatusReq');
@@ -120,10 +122,10 @@ class AcquirerStatusReqTransaction {
 	/**
 	 * Serializes the object into a Transaction
 	 * 
-	 * @return DOMElement
+	 * @return \DOMElement
 	 */
 	public function toXML() {
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the Transaction elem */
 		$Transaction = $domtree->createElement('Transaction');
@@ -137,24 +139,3 @@ class AcquirerStatusReqTransaction {
 
 }
 
-/**
- * Describes a status request
- */
-class StatusRequest {
-
-	/**
-	 * The transaction ID to check
-	 * @var string 
-	 */
-	public $TransactionId;
-
-	/**
-	 * Constructor that highlights all required fields for this object
-	 * 
-	 * @param string $TransactionId
-	 */
-	function __construct($TransactionId) {
-		$this->TransactionId = $TransactionId;
-	}
-
-}

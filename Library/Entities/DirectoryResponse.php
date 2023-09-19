@@ -1,7 +1,8 @@
 <?php
 
-require_once "ErrorResponse.php";
+namespace EMandates\Merchant\Library\Entities;
 
+use EMandates\Merchant\Library\Libraries\{XmlUtility, CommunicatorException};
 /**
  * Description of DebtorBank
  */
@@ -45,8 +46,8 @@ class DirectoryResponse {
 	public $Error = null;
 
 	/**
-	 * DateTime set to when this directory was last updated
-	 * @var DateTime
+	 * \DateTime set to when this directory was last updated
+	 * @var \DateTime
 	 */
 	public $DirectoryDateTimestamp;
 
@@ -85,12 +86,12 @@ class DirectoryResponse {
 	private function _buildAcquirerErrorRes($data) {
 		$this->Error = new ErrorResponse($data);
 		$this->IsError = true;
-		$this->DirectoryDateTimestamp = new DateTime((string) $data->createDateTimestamp);
+		$this->DirectoryDateTimestamp = new \DateTime((string) $data->createDateTimestamp);
 		$this->DebtorBanks = null;
 	}
 
 	private function _buildDirectoryRes($data) {
-		$this->DirectoryDateTimestamp = new DateTime((string) $data->Directory->DirectoryDateTimestamp);
+		$this->DirectoryDateTimestamp = new \DateTime((string) $data->Directory->DirectoryDateTimestamp);
 
 		if (!empty($data->Directory->Country)) {
 			foreach ($data->Directory->Country as $countryElem) {

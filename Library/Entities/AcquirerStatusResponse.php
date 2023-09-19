@@ -1,5 +1,9 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
+use EMandates\Merchant\Library\Libraries\{XmlUtility, CommunicatorException, XmlValidator};
+
 /**
  * Represents a status response
  */
@@ -37,8 +41,8 @@ class AcquirerStatusResponse {
 	public $Status = null;
 
 	/**
-	 * DateTime when the status was created, or null if no such date available (for example, when mandate has expired)
-	 * @var DateTime 
+	 * \DateTime when the status was created, or null if no such date available (for example, when mandate has expired)
+	 * @var \DateTime 
 	 */
 	public $StatusDateTimestamp = null;
 
@@ -96,14 +100,14 @@ class AcquirerStatusResponse {
 
 	private function _buildStatusResponse($data) {
 		$this->TransactionId = (string) $data->Transaction->transactionID;
-		$this->StatusDateTimestamp = new DateTime((string) $data->Directory->DirectoryDateTimestamp);
+		$this->StatusDateTimestamp = new \DateTime((string) $data->Directory->DirectoryDateTimestamp);
 		
 		if ($this->Status == AcquirerStatusResponse::STATUS_SUCCESS) {
-			$temp_dom = new DOMDocument('1.0', 'UTF-8');
+			$temp_dom = new \DOMDocument('1.0', 'UTF-8');
 			$temp_dom->loadXML($data->asXML());
 			$Document = $temp_dom->getElementsByTagName('Document');
 
-			$domtree = new DOMDocument('1.0', 'UTF-8');
+			$domtree = new \DOMDocument('1.0', 'UTF-8');
 			$domtree->appendChild($domtree->importNode($Document->item(0), true));
 		
 			$this->AcceptanceReport = new AcceptanceReport($domtree);
@@ -116,11 +120,11 @@ class AcquirerStatusResponse {
 	 * @param string $xml
 	 */
 	private function _validateResponseDocument($xml) {
-		$temp_dom = new DOMDocument('1.0', 'UTF-8');
+		$temp_dom = new \DOMDocument('1.0', 'UTF-8');
 		$temp_dom->loadXML($xml);
 		$Document = $temp_dom->getElementsByTagName('Document');
 
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 		$domtree->appendChild($domtree->importNode($Document->item(0), true));
 
 		XmlValidator::isValidatXML($domtree->saveXML(), XmlValidator::SCHEMA_PAIN012, $this->logger);
@@ -141,7 +145,7 @@ class AcceptanceReport {
 
 	/**
 	 * Message timestamp
-	 * @var DateTime
+	 * @var \DateTime
 	 */
 	public $DateTime;
 
@@ -290,17 +294,17 @@ class AcceptanceReport {
 	/**
 	 * Deserializes the data into an AcceptanceReport
 	 * 
-	 * @param SimpleXMLElement $data
+	 * @param \DOMDocument $data
 	 */
 	public function __construct($data) {
-		$xpath = new DOMXpath($data);
+		$xpath = new \DOMXpath($data);
 		$xpath->registerNamespace("p", $data->documentElement->namespaceURI);
 		
 		$grpHdr = '/p:Document/p:MndtAccptncRpt/p:GrpHdr';
 		$accDtls = '/p:Document/p:MndtAccptncRpt/p:UndrlygAccptncDtls';
 		
 		$this->MessageId = (string) $xpath->evaluate($grpHdr . '/p:MsgId')->item(0)->nodeValue;
-		$this->DateTime = new DateTime((string) $xpath->evaluate($grpHdr . '/p:CreDtTm')->item(0)->nodeValue );
+		$this->DateTime = new \DateTime((string) $xpath->evaluate($grpHdr . '/p:CreDtTm')->item(0)->nodeValue );
 		$this->ValidationReference = (string) $xpath->evaluate($grpHdr . '/p:Authstn/p:Prtry')->item(0)->nodeValue;
 		$this->OriginalMessageId = (string) $xpath->evaluate($accDtls . '/p:OrgnlMsgInf/p:MsgId')->item(0)->nodeValue;
 		$this->MessageNameId = (string) $xpath->evaluate($accDtls . '/p:OrgnlMsgInf/p:MsgNmId')->item(0)->nodeValue;

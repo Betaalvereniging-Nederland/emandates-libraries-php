@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Libraries;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -9,10 +11,10 @@
 /**
  * Description of CommunicatorException
  */
-class CommunicatorException extends Exception {
+class CommunicatorException extends \Exception {
 	
 	/**
-	 * Createst an Exception with custom message so it can be parsed by the ErrorResponse
+	 * Creates an \Exception with custom message so it can be parsed by the ErrorResponse
 	 * 
 	 * @param string $message
 	 * @param string | int $code

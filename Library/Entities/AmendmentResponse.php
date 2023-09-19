@@ -1,5 +1,9 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
+use EMandates\Merchant\Library\Libraries\{CommunicatorException, XmlUtility};
+
 /**
  * Represents an amendment response
  */
@@ -30,8 +34,8 @@ class AmendmentResponse {
 	public $TransactionId = null;
 
 	/**
-	 * DateTime set to when this transaction was created
-	 * @var DateTime
+	 * \DateTime set to when this transaction was created
+	 * @var \DateTime
 	 */
 	public $TransactionCreateDateTimestamp;
 
@@ -64,13 +68,13 @@ class AmendmentResponse {
 	private function _buildAcquirerErrorRes($data) {
 		$this->Error = new ErrorResponse($data);
 		$this->IsError = true;
-		$this->TransactionCreateDateTimestamp = new DateTime((string) $data->createDateTimestamp);
+		$this->TransactionCreateDateTimestamp = new \DateTime((string) $data->createDateTimestamp);
 	}
 
 	private function _buildAmendmentRes($data) {
 		$this->IssuerAuthenticationUrl = (string) $data->Issuer->issuerAuthenticationURL;
 		$this->TransactionId = (string) $data->Transaction->transactionID;
 
-		$this->TransactionCreateDateTimestamp = new DateTime((string) $data->Transaction->transactionCreateDateTimestamp);
+		$this->TransactionCreateDateTimestamp = new \DateTime((string) $data->Transaction->transactionCreateDateTimestamp);
 	}
 }

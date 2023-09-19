@@ -1,11 +1,16 @@
 <?php
 
+use EMandates\Merchant\Library\Entities\{NewMandateResponse,
+	AcquirerStatusResponse,
+	CancellationResponse,
+	AmendmentResponse
+};
 /**
  * Useful functions for displaying Response
  */
 class Util {
 
-	public static function showError(ErrorResponse $error) {
+	public static function showError($error) {
 		echo '
             <div class="error">
                 ' . ($error->ErrorCode ? $error->ErrorCode . ': ' : '') . $error->ErrorMessage . ' <br />
@@ -123,7 +128,7 @@ class Util {
 	
 	public static function showXML($object) {
 		if (!empty($object->RawMessage)) {
-			$domTree = new DOMDocument();
+			$domTree = new \DOMDocument();
 			$domTree->preserveWhiteSpace = false;
 			$domTree->formatOutput = true;
 			$domTree->loadXML($object->RawMessage);
@@ -175,7 +180,7 @@ class Util {
 			return null;
 		}
 		
-		return new DateInterval(strtoupper($interval));
+		return new \DateInterval(strtoupper($interval));
 	}
 
 }

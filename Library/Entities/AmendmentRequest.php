@@ -1,5 +1,8 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
+use EMandates\Merchant\Library\Libraries\{MessageIdGenerator, XmlValidator ,CommunicatorException};
 /**
  * Describes an amendment request
  */
@@ -30,7 +33,7 @@ class AmendmentRequest {
 	/**
 	 * Optional: The period of validity of the transaction request as stated by the creditor measured from the receipt by the debtor bank.
 	 * The debtor must authorise the transaction within this period.
-	 * @var DateInterval 
+	 * @var \DateInterval 
 	 */
 	public $ExpirationPeriod;
 
@@ -109,7 +112,7 @@ class AmendmentRequest {
 	 * @param string $originalIBAN
 	 * @param string $originalDebtorBankId
 	 * @param string $messageId - optional
-	 * @param DateInterval $expirationPeriod - optional
+	 * @param \DateInterval $expirationPeriod - optional
 	 */
 	public function __construct(
 	$entranceCode, $language, $eMandateId, $eMandateReason, $debtorReference, $debtorBankId, $purchaseId, $sequenceType, $originalIBAN, $originalDebtorBankId, $messageId = '', $expirationPeriod = null) {
@@ -139,13 +142,13 @@ class AmendmentRequest {
 	 * Serializes the object into a Document 
 	 * 
 	 * @param string $LocalInstrumentCode
-	 * @return DOMElement
+	 * @return \DOMElement
 	 */
 	public function toXml($LocalInstrumentCode) {
 		$this->logger->Log("building eMandate");
 		$this->validateExpirationPeriod();
 
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the Document element with it's namespaces */
 		$Document = $domtree->createElement('Document');
@@ -156,8 +159,8 @@ class AmendmentRequest {
 			$MndtAmdmntReq = $domtree->createElement('MndtAmdmntReq'); {
 				/* create the GrpHdr element */
 				$GrpHdr = $domtree->createElement('GrpHdr'); {
-					$GrpHdr->appendChild(new DOMElement('MsgId', $this->MessageId));
-					$GrpHdr->appendChild(new DOMElement('CreDtTm', date('Y-m-d\TH:i:s'.substr((string)microtime(), 1, 4).'\Z')));
+					$GrpHdr->appendChild(new \DOMElement('MsgId', $this->MessageId));
+					$GrpHdr->appendChild(new \DOMElement('CreDtTm', date('Y-m-d\TH:i:s'.substr((string)microtime(), 1, 4).'\Z')));
 				}
 				$MndtAmdmntReq->appendChild($GrpHdr);
 
@@ -167,7 +170,7 @@ class AmendmentRequest {
 					$AmdmntRsn = $domtree->createElement('AmdmntRsn'); {
 						/* create the Rsn element */
 						$Rsn = $domtree->createElement('Rsn');
-						$Rsn->appendChild(new DOMElement('Cd', self::MD16));
+						$Rsn->appendChild(new \DOMElement('Cd', self::MD16));
 						$AmdmntRsn->appendChild($Rsn);
 					}
 					$UndrlygAmdmntDtls->appendChild($AmdmntRsn);
@@ -184,30 +187,30 @@ class AmendmentRequest {
 						$Tp = $domtree->createElement('Tp'); {
 							/* create SvcLvl element */
 							$SvcLvl = $domtree->createElement('SvcLvl');
-							$SvcLvl->appendChild(new DOMElement('Cd', self::SEPA));
+							$SvcLvl->appendChild(new \DOMElement('Cd', self::SEPA));
 							$Tp->appendChild($SvcLvl);
 
 							/* create LclInstrm element */
 							$LclInstrm = $domtree->createElement('LclInstrm');
-							$LclInstrm->appendChild(new DOMElement('Cd', $LocalInstrumentCode));
+							$LclInstrm->appendChild(new \DOMElement('Cd', $LocalInstrumentCode));
 							$Tp->appendChild($LclInstrm);
 						}
 						$Mndt->appendChild($Tp);
 
 						/* create Ocrncs element */
 						$Ocrncs = $domtree->createElement('Ocrncs');
-						$Ocrncs->appendChild(new DOMElement('SeqTp', $this->SequenceType));
+						$Ocrncs->appendChild(new \DOMElement('SeqTp', $this->SequenceType));
 						$Mndt->appendChild($Ocrncs);
 
 						/* create Rsn element */
 						if (!empty($this->eMandateReason)) {
 							$Rsn1 = $domtree->createElement('Rsn');
-							$Rsn1->appendChild(new DOMElement('Prtry', $this->eMandateReason));
+							$Rsn1->appendChild(new \DOMElement('Prtry', $this->eMandateReason));
 							$Mndt->appendChild($Rsn1);
 						}
 
 						/* create Cdtr element */
-						$Mndt->appendChild(new DOMElement('Cdtr'));
+						$Mndt->appendChild(new \DOMElement('Cdtr'));
 
 						/* create Dbtr element */
 						$Dbtr = $domtree->createElement('Dbtr'); {
@@ -215,7 +218,7 @@ class AmendmentRequest {
 								$Id = $domtree->createElement('Id'); {
 								$PrvtId = $domtree->createElement('PrvtId'); {
 									$Othr = $domtree->createElement('Othr');
-									$Othr->appendChild(new DOMElement('Id', $this->DebtorReference));
+									$Othr->appendChild(new \DOMElement('Id', $this->DebtorReference));
 									$PrvtId->appendChild($Othr);
 									}
 								}
@@ -228,7 +231,7 @@ class AmendmentRequest {
 						/* create the DbtrAgt element */
 						$DbtrAgt = $domtree->createElement('DbtrAgt'); {
 							$FinInstnId = $domtree->createElement('FinInstnId');
-							$FinInstnId->appendChild(new DOMElement('BICFI', $this->DebtorBankId));
+							$FinInstnId->appendChild(new \DOMElement('BICFI', $this->DebtorBankId));
 							$DbtrAgt->appendChild($FinInstnId);
 						}
 						$Mndt->appendChild($DbtrAgt);
@@ -238,7 +241,7 @@ class AmendmentRequest {
 							$RfrdDoc = $domtree->createElement('RfrdDoc'); {							
 								$Tp = $domtree->createElement('Tp'); {
 									$CdOrPrtry = $domtree->createElement('CdOrPrtry');
-									$CdOrPrtry->appendChild(new DOMElement('Prtry', $this->PurchaseId));
+									$CdOrPrtry->appendChild(new \DOMElement('Prtry', $this->PurchaseId));
 									$Tp->appendChild($CdOrPrtry);
 								}
 								$RfrdDoc->appendChild($Tp);
@@ -255,7 +258,7 @@ class AmendmentRequest {
 						$OrgnlMndt->appendChild($domtree->createElement('MndtId', $this->eMandateId));
 
 						/* create Cdtr element */
-						$OrgnlMndt->appendChild(new DOMElement('Cdtr'));
+						$OrgnlMndt->appendChild(new \DOMElement('Cdtr'));
 
 						/* create Dbtr element */
 						$Dbtr = $domtree->createElement('Dbtr');
@@ -264,7 +267,7 @@ class AmendmentRequest {
 						/* create DbtrAcct element */
 						$DbtrAcct = $domtree->createElement('DbtrAcct'); {
 							$Id = $domtree->createElement('Id');
-							$Id->appendChild(new DOMElement('IBAN', $this->OriginalIBAN));
+							$Id->appendChild(new \DOMElement('IBAN', $this->OriginalIBAN));
 							$DbtrAcct->appendChild($Id);
 						}
 						$OrgnlMndt->appendChild($DbtrAcct);
@@ -272,7 +275,7 @@ class AmendmentRequest {
 						/* create the DbtrAgt element */
 						$DbtrAgt = $domtree->createElement('DbtrAgt'); {
 							$FinInstnId = $domtree->createElement('FinInstnId');
-							$FinInstnId->appendChild(new DOMElement('BICFI', $this->OriginalDebtorBankId));
+							$FinInstnId->appendChild(new \DOMElement('BICFI', $this->OriginalDebtorBankId));
 							$DbtrAgt->appendChild($FinInstnId);
 						}
 						$OrgnlMndt->appendChild($DbtrAgt);
@@ -300,10 +303,10 @@ class AmendmentRequest {
 		
 		//EXPIRATION PERIOD
 		if(!empty($this->ExpirationPeriod)){
-			$max_future = new DateTime();
-			$max_future->add(new DateInterval('P7DT1S')); // max plus one second
+			$max_future = new \DateTime();
+			$max_future->add(new \DateInterval('P7DT1S')); // max plus one second
 
-			$future = new DateTime();
+			$future = new \DateTime();
 			$future->add($this->ExpirationPeriod);
 
 			$check_interval2 = $max_future->diff($future);

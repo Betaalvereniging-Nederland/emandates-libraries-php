@@ -1,5 +1,9 @@
 <?php
 
+namespace EMandates\Merchant\Library\Libraries;
+
+use EMandates\Merchant\Library\Configuration\Configuration;
+
 /**
  * Description of Logger
  */
@@ -32,7 +36,7 @@ class Logger {
 	}
 
     /** Saves the desired dom or xml into the logPath folder
-     * @param DOMDocument/string $dom
+     * @param \DOMDocument | string $dom
      * @param bool $isXML
      * @param string $fileName
      */
@@ -41,7 +45,7 @@ class Logger {
         if ($this->enableXMLLogs) {
 			if ($isXML) {
                 $oldValue = libxml_disable_entity_loader(true);
-                $domtree = new DOMDocument();
+                $domtree = new \DOMDocument();
                 $domtree->loadXML($dom);
                 libxml_disable_entity_loader($oldValue);
 
@@ -55,7 +59,7 @@ class Logger {
 
 			$t = microtime(true);
 			$micro = sprintf("%06d", ($t - floor($t)) * 1000000);
-			$d = new DateTime(date('Y-m-d H:i:s.' . $micro, $t));
+			$d = new \DateTime(date('Y-m-d H:i:s.' . $micro, $t));
 
             // $dom->save($dirName . '/' . $d->format($this->fileNamePrefix) . '-' . (!empty($dom->documentElement->localName) ? $dom->documentElement->localName : '') . '.xml');
             $name = (!empty($dom->documentElement->localName) ? $dom->documentElement->localName : '');

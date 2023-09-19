@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Libraries;
+
 /**
  * Class that automatically generates MessageId's. You may use this to set the MessageId field manually, or you can use
  * the constructors for NewMandateRequest, AmendmentRequest or CancellationRequest to do it automatically.

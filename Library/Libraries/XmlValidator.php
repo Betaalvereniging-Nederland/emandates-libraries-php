@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Libraries;
+
 /**
  * Description of XmlValidator
  */
@@ -31,14 +33,14 @@ class XmlValidator {
 	 * 
 	 * @param string $xml
 	 * @return boolean
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public static function isValidatXML($xml, $schemaName, $logger) {
 		$validator = new self();
 
 		libxml_use_internal_errors(true);
 
-		$document = new DOMDocument();
+		$document = new \DOMDocument();
 		$document->loadXML($xml);
 
 		if (!$document->schemaValidate($validator->$schemaName)) {

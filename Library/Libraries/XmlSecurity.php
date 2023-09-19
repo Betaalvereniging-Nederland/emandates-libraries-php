@@ -1,7 +1,9 @@
 <?php
 
-require_once 'xmlseclibs.php';
-require_once 'CommunicatorException.php';
+namespace EMandates\Merchant\Library\Libraries;
+
+use RobRichards\XMLSecLibs\XMLSecurityDSig;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
 
 const BEGIN_CERTIFICATE = '-----BEGIN CERTIFICATE-----';
 const END_CERTIFICATE = '-----END CERTIFICATE-----';
@@ -14,11 +16,11 @@ class XmlSecurity {
 		$this->logger = $logger;
 	}
 
-	public function sign(DOMDocument $docTree, $privateCertificatePath, $privateKeyPath, $passphrase) {
+	public function sign(\DOMDocument $docTree, $privateCertificatePath, $privateKeyPath, $passphrase) {
 		$this->logger->Log("signing xml...");
 		
 		/* The GOOD thing that fixed the xignature */
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		$doc->loadXML($docTree->saveXML());
 		
 		$signature = new XMLSecurityDSig();		
@@ -44,7 +46,7 @@ class XmlSecurity {
 
 		$this->logger->Log("embedding thumbprint: {{$fingerprint}}");
 
-		$signature->addKeyInfoAndName($fingerprint);
+        $signature->appendToKeyInfo($signature->sigNode->ownerDocument->createElement('KeyName', $fingerprint));
 		
 		$signature->appendSignature($doc->documentElement);
 
@@ -61,7 +63,7 @@ class XmlSecurity {
 
 		try {
 			$signature->validateReference();
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			$this->logger->Log("Reference Validation Failed");
 			throw new CommunicatorException('Reference Validation Failed', $ex->getCode());
 		}
@@ -99,7 +101,7 @@ class XmlSecurity {
 		
 		try {
 			$signature->validateReference();
-		} catch (Exception $ex) {
+		} catch (\Exception $ex) {
 			$this->logger->Log("emandate signature: reference validation failed");
 			throw new CommunicatorException('emandate signature: reference validation failed', $ex->getCode());
 		}
@@ -124,17 +126,18 @@ class XmlSecurity {
 	public function verify($xml, $certificatePath) {
 		$this->logger->Log("checking signature...");
 		
-		$doc = new DOMDocument();
+		$doc = new \DOMDocument();
 		$doc->loadXML($xml);
 		
 		$signature = new XMLSecurityDSig();
-		if ($signature->signaturesCount($doc) == 2) {
+		// if ($signature->signaturesCount($doc) == 2) {
+		if ($doc->getElementsByTagName('Signature')->length == 2) {
 			// TODO: first check emandate signature
 /*
                         //Previous approach
 			$eMandate = $doc->getElementsByTagNameNS('urn:iso:std:iso:20022:tech:xsd:pain.012.001.04', 'Document')->item(0);
 			$newEmandate = $eMandate->cloneNode(TRUE);
-			$emandatedoc = new DOMDocument();
+			$emandatedoc = new \DOMDocument();
 			$newEmandate = $emandatedoc->importNode($newEmandate, TRUE);
 			$emandatedoc->appendChild($newEmandate);
 */
@@ -142,7 +145,7 @@ class XmlSecurity {
                         //New approach
 			$eMandate = $doc->getElementsByTagNameNS('urn:iso:std:iso:20022:tech:xsd:pain.012.001.04', 'Document')->item(0);
                         $eMandateC14N = $eMandate->C14N();
-			$emandatedoc = new DOMDocument();
+			$emandatedoc = new \DOMDocument();
                         $emandatedoc->preserveWhiteSpace = true;
                         $emandatedoc->loadXML($eMandateC14N);
                         $s3=$emandatedoc->saveXML();

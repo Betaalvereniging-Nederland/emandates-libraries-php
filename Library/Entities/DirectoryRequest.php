@@ -1,5 +1,7 @@
 <?php
 
+namespace EMandates\Merchant\Library\Entities;
+
 /**
  * Description of DirectoryRequest
  */
@@ -33,7 +35,7 @@ class DirectoryRequest {
 	 * @return \DOMDocument
 	 */
 	public function toXml() {
-		$domtree = new DOMDocument('1.0', 'UTF-8');
+		$domtree = new \DOMDocument('1.0', 'UTF-8');
 
 		/* create the root element of the xml tree */
 		$DirectoryReq = $domtree->createElementNS(self::XMLNS, 'DirectoryReq');

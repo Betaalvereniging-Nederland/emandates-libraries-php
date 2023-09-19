@@ -1,6 +1,14 @@
 <?php 
-require_once 'libs/Communicator/CoreCommunicator.php';
-require_once 'libs/Communicator/B2BCommunicator.php';
+
+require __DIR__ . '/../vendor/autoload.php';
+
+require_once dirname(__FILE__) . '/config/eMandatesConfig.php';
+
+use EMandates\Merchant\Library;
+use EMandates\Merchant\Library\Configuration\Configuration;
+
+use EMandates\Merchant\Library\Entities;
+
 
 require_once 'Util.php';
 require_once 'DBLogger.php';
@@ -22,21 +30,21 @@ date_default_timezone_set('UTC');
 
 
 //$dbLogger = new DBLogger();
-// Initiate a CoreCommunicator with custom Logger
-//$coreCommunicator = new CoreCommunicator(Configuration::getDefault(), $dbLogger);
-// Initiate a B2BCommunicator with custom Logger
-//$b2BCommunicator = new B2BCommunicator(Configuration::getDefault(), $dbLogger);
+// Initiate a Library\CoreCommunicator with custom Logger
+//$coreCommunicator = new Library\CoreCommunicator(Configuration::getDefault(), $dbLogger);
+// Initiate a Library\B2BCommunicator with custom Logger
+//$b2BCommunicator = new Library\B2BCommunicator(Configuration::getDefault(), $dbLogger);
 
 
-// Initiate a CoreCommunicator
-$coreCommunicator = new CoreCommunicator(Configuration::getDefault());
-// Initiate a B2BCommunicator
-$b2BCommunicator = new B2BCommunicator(Configuration::getDefault());
+// Initiate a Library\CoreCommunicator
+$coreCommunicator = new Library\CoreCommunicator(Configuration::getDefault());
+// Initiate a Library\B2BCommunicator
+$b2BCommunicator = new Library\B2BCommunicator(Configuration::getDefault());
 
 
 // Available starting with 1.2.5 version
-// $coreCommunicator = new CoreCommunicator();
-// $b2BCommunicator = new B2BCommunicator();
+// $coreCommunicator = new Library\CoreCommunicator();
+// $b2BCommunicator = new Library\B2BCommunicator();
 
 
 //----------------------- DIRECTORY REQUEST ------------------------------------
@@ -47,7 +55,7 @@ if (!empty($_POST['directoryRequest'])) {
 //----------------------- NEW EMANDATE REQUEST ---------------------------------
 if (!empty($_POST['issueMandate'])) {
 
-	$newMandateRequest = new NewMandateRequest(
+	$newMandateRequest = new Entities\NewMandateRequest(
 			$params['entranceCode'],
 			$params['language'],
 			$params['messageId'],
@@ -67,7 +75,7 @@ if (!empty($_POST['issueMandate'])) {
 //----------------------- GET TRANSACTION STATUS REQUEST -----------------------
 if (!empty($_POST['getTransactionStatus'])) {
 	
-	$statusRequest = new StatusRequest($params['transactionId']);
+	$statusRequest = new Entities\StatusRequest($params['transactionId']);
 
 	$transactionStatusResponse = $coreCommunicator->GetStatus($statusRequest);
 }
@@ -75,7 +83,7 @@ if (!empty($_POST['getTransactionStatus'])) {
 //----------------------- AMEND TRANSACTION ------------------------------------
 if (!empty($_POST['amendTransaction'])) {
 	
-	$amendmentRequest = new AmendmentRequest(
+	$amendmentRequest = new Entities\AmendmentRequest(
 			$params['amend_entranceCode'],
 			$params['amend_language'],
 			$params['amend_eMandateId'],
@@ -96,7 +104,7 @@ if (!empty($_POST['amendTransaction'])) {
 //----------------------- CANCEL TRANSACTION -----------------------------------
 if (!empty($_POST['cancelTransaction'])) {
 		
-	$cancellationReq = new CancellationRequest(
+	$cancellationReq = new Entities\CancellationRequest(
 			$params['cancel_entranceCode'],
 			$params['cancel_language'],
 			$params['cancel_eMandateId'],
