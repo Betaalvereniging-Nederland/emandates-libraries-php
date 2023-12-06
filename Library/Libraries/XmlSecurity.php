@@ -46,7 +46,7 @@ class XmlSecurity {
 
 		$this->logger->Log("embedding thumbprint: {{$fingerprint}}");
 
-        $signature->appendToKeyInfo($signature->sigNode->ownerDocument->createElement('KeyName', $fingerprint));
+        $signature->appendToKeyInfo($signature->sigNode->ownerDocument->createElementNS('http://www.w3.org/2000/09/xmldsig#', 'KeyName', $fingerprint));
 		
 		$signature->appendSignature($doc->documentElement);
 
